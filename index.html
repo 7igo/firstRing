@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FirstRing — Never Miss A Call Again</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: #020408; color: #fff; overflow-x: hidden; }
+
+    #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+    .orb { position: fixed; border-radius: 50%; filter: blur(120px); opacity: 0.18; animation: drift 12s ease-in-out infinite alternate; pointer-events: none; z-index: 0; }
+    .orb-1 { width: 600px; height: 600px; background: #2563eb; top: -200px; left: -100px; animation-delay: 0s; }
+    .orb-2 { width: 500px; height: 500px; background: #7c3aed; top: 30%; right: -150px; animation-delay: 3s; }
+    .orb-3 { width: 400px; height: 400px; background: #0ea5e9; bottom: 10%; left: 20%; animation-delay: 6s; }
+    @keyframes drift { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(40px,30px) scale(1.1); } }
+    body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 60px 60px; z-index: 0; pointer-events: none; }
+
+    section, nav, footer { position: relative; z-index: 1; }
+
+    /* NAV */
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 22px 80px; backdrop-filter: blur(12px); background: rgba(2,4,8,0.7); border-bottom: 1px solid rgba(255,255,255,0.06); position: sticky; top: 0; z-index: 100; }
+    .logo { font-size: 26px; font-weight: 900; letter-spacing: -1px; display: flex; align-items: center; gap: 10px; }
+    .logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, #2563eb, #7c3aed); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: 0 0 20px rgba(37,99,235,0.5); }
+    .logo span { color: #3b82f6; }
+    .nav-links { display: flex; gap: 36px; }
+    .nav-links a { color: #9ca3af; text-decoration: none; font-size: 15px; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: #fff; }
+    .nav-cta { background: #2563eb; color: #fff; padding: 11px 26px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; transition: background 0.2s, transform 0.2s; box-shadow: 0 0 20px rgba(37,99,235,0.4); }
+    .nav-cta:hover { background: #1d4ed8; transform: translateY(-1px); }
+
+    /* HERO */
+    .hero { text-align: center; padding: 130px 20px 100px; max-width: 860px; margin: 0 auto; }
+    .badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(37,99,235,0.15); border: 1px solid rgba(37,99,235,0.4); color: #93c5fd; padding: 7px 18px; border-radius: 999px; font-size: 13px; font-weight: 600; margin-bottom: 32px; }
+    .badge-dot { width: 7px; height: 7px; background: #3b82f6; border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+    .hero h1 { font-size: 72px; font-weight: 900; line-height: 1.05; letter-spacing: -2px; margin-bottom: 28px; }
+    .hero h1 .grad { background: linear-gradient(135deg, #3b82f6, #8b5cf6, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .hero p { font-size: 20px; color: #9ca3af; line-height: 1.75; margin-bottom: 48px; max-width: 580px; margin-left: auto; margin-right: auto; }
+    .hero-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary { display: inline-flex; align-items: center; gap: 10px; background: #2563eb; color: #fff; padding: 16px 36px; border-radius: 10px; font-size: 17px; font-weight: 700; text-decoration: none; box-shadow: 0 0 40px rgba(37,99,235,0.5); transition: transform 0.2s, box-shadow 0.2s; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 60px rgba(37,99,235,0.7); }
+    .btn-secondary { display: inline-flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #fff; padding: 16px 36px; border-radius: 10px; font-size: 17px; font-weight: 600; text-decoration: none; transition: background 0.2s; }
+    .btn-secondary:hover { background: rgba(255,255,255,0.1); }
+    .hero-sub { color: #4b5563; font-size: 13px; margin-top: 20px; }
+
+    .stats { display: flex; justify-content: center; gap: 60px; padding: 40px 20px; flex-wrap: wrap; border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); background: rgba(255,255,255,0.02); }
+    .stat { text-align: center; }
+    .stat-num { font-size: 40px; font-weight: 800; color: #3b82f6; letter-spacing: -1px; }
+    .stat-label { color: #6b7280; font-size: 14px; margin-top: 4px; }
+
+    /* DEMO */
+    .demo-section { padding: 100px 20px; text-align: center; }
+    .section-label { color: #3b82f6; font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px; }
+    .demo-section h2 { font-size: 44px; font-weight: 800; letter-spacing: -1px; margin-bottom: 16px; }
+    .demo-section > p { color: #9ca3af; font-size: 18px; max-width: 560px; margin: 0 auto 32px; line-height: 1.7; }
+
+    /* Mode toggle */
+    .mode-toggle-row { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 32px; }
+    .mode-label { font-size: 14px; color: #9ca3af; font-weight: 500; }
+    .mode-label.active-label { color: #fff; font-weight: 700; }
+    .toggle-wrap { position: relative; width: 52px; height: 28px; cursor: pointer; }
+    .toggle-wrap input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; inset: 0; background: #1e3a8a; border-radius: 999px; transition: background 0.3s; }
+    .toggle-slider::before { content: ''; position: absolute; width: 20px; height: 20px; left: 4px; top: 4px; background: #fff; border-radius: 50%; transition: transform 0.3s; }
+    .toggle-wrap input:checked + .toggle-slider { background: #2563eb; }
+    .toggle-wrap input:checked + .toggle-slider::before { transform: translateX(24px); }
+    .mode-badge { font-size: 12px; padding: 3px 10px; border-radius: 999px; font-weight: 700; }
+    .mode-badge.confirm { background: rgba(234,179,8,0.15); color: #fbbf24; border: 1px solid rgba(234,179,8,0.3); }
+    .mode-badge.auto { background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid rgba(34,197,94,0.3); }
+
+    .demo-tabs { display: flex; justify-content: center; gap: 12px; margin-bottom: 40px; }
+    .demo-tab { padding: 10px 28px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: #9ca3af; transition: all 0.2s; }
+    .demo-tab.active { background: #2563eb; border-color: #2563eb; color: #fff; box-shadow: 0 0 20px rgba(37,99,235,0.4); }
+
+    .demo-panels { display: flex; gap: 24px; max-width: 1100px; margin: 0 auto 60px; flex-wrap: wrap; justify-content: center; }
+
+    /* Phone */
+    .phone-demo, .sms-demo { flex: 1; min-width: 300px; max-width: 480px; }
+    .phone-shell, .sms-shell { background: #111; border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; overflow: hidden; }
+    .phone-header, .sms-header { background: #1a1a1a; padding: 16px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .phone-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #2563eb, #7c3aed); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .phone-info h4 { font-size: 15px; font-weight: 700; }
+    .phone-info p { font-size: 12px; color: #6b7280; }
+    .phone-status { margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 13px; color: #22c55e; font-weight: 600; }
+    .phone-status-dot { width: 8px; height: 8px; background: #22c55e; border-radius: 50%; animation: pulse 1.5s infinite; }
+    .call-transcript { padding: 20px; height: 360px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
+    .call-line { display: flex; gap: 10px; align-items: flex-start; opacity: 0; transform: translateY(10px); transition: opacity 0.4s, transform 0.4s; }
+    .call-line.show { opacity: 1; transform: translateY(0); }
+    .call-speaker { font-size: 11px; font-weight: 700; min-width: 60px; padding-top: 3px; }
+    .call-speaker.ai { color: #3b82f6; }
+    .call-speaker.customer { color: #f59e0b; }
+    .call-bubble { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 10px 14px; font-size: 14px; color: #d1d5db; line-height: 1.6; flex: 1; }
+    .call-line.ai-line .call-bubble { background: rgba(37,99,235,0.12); border: 1px solid rgba(37,99,235,0.2); }
+    .confirm-bubble { background: rgba(234,179,8,0.1); border: 1px solid rgba(234,179,8,0.3); border-radius: 12px; padding: 12px 14px; font-size: 13px; color: #fbbf24; line-height: 1.6; flex: 1; }
+    .typing-indicator { display: flex; gap: 4px; padding: 12px 14px; }
+    .typing-dot { width: 7px; height: 7px; background: #4b5563; border-radius: 50%; animation: typingBounce 1.2s infinite; }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typingBounce { 0%,60%,100% { transform:translateY(0); } 30% { transform:translateY(-8px); } }
+
+    /* SMS */
+    .sms-messages { padding: 20px; height: 360px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+    .sms-msg { max-width: 82%; opacity: 0; transform: translateY(10px); transition: opacity 0.4s, transform 0.4s; }
+    .sms-msg.show { opacity: 1; transform: translateY(0); }
+    .sms-msg.from-customer { align-self: flex-end; }
+    .sms-msg.from-ai { align-self: flex-start; }
+    .sms-bubble { padding: 10px 14px; border-radius: 16px; font-size: 14px; line-height: 1.6; }
+    .from-customer .sms-bubble { background: #2563eb; color: #fff; border-bottom-right-radius: 4px; }
+    .from-ai .sms-bubble { background: rgba(255,255,255,0.08); color: #d1d5db; border-bottom-left-radius: 4px; }
+    .confirm-sms-bubble { background: rgba(234,179,8,0.1); border: 1px solid rgba(234,179,8,0.3); border-radius: 16px; border-bottom-left-radius: 4px; padding: 10px 14px; font-size: 13px; color: #fbbf24; line-height: 1.6; }
+    .sms-time { font-size: 11px; color: #4b5563; margin-top: 4px; }
+    .from-customer .sms-time { text-align: right; }
+
+    /* Owner notification card */
+    .owner-notify { max-width: 420px; margin: 0 auto 24px; background: rgba(234,179,8,0.07); border: 1px solid rgba(234,179,8,0.25); border-radius: 16px; padding: 20px 24px; text-align: left; opacity: 0; transform: translateY(16px); transition: opacity 0.5s, transform 0.5s; }
+    .owner-notify.show { opacity: 1; transform: translateY(0); }
+    .owner-notify-title { font-size: 13px; font-weight: 700; color: #fbbf24; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .owner-notify p { font-size: 14px; color: #d1d5db; line-height: 1.6; margin-bottom: 14px; }
+    .owner-notify-btns { display: flex; gap: 10px; }
+    .confirm-btn { flex: 1; background: #16a34a; color: #fff; border: none; border-radius: 8px; padding: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+    .confirm-btn:hover { background: #15803d; }
+    .reschedule-btn { flex: 1; background: rgba(255,255,255,0.06); color: #9ca3af; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+    .reschedule-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+    /* Demo CTA */
+    .demo-cta-box { max-width: 560px; margin: 0 auto; background: rgba(37,99,235,0.08); border: 1px solid rgba(37,99,235,0.3); border-radius: 20px; padding: 40px; text-align: center; opacity: 0; transition: opacity 0.6s; pointer-events: none; }
+    .demo-cta-box.show { opacity: 1; pointer-events: all; }
+    .demo-cta-box h3 { font-size: 24px; font-weight: 800; margin-bottom: 8px; }
+    .demo-cta-box p { color: #9ca3af; margin-bottom: 28px; font-size: 15px; }
+    .phone-input-row { display: flex; gap: 10px; }
+    .phone-input { flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; padding: 14px 18px; color: #fff; font-size: 16px; font-family: 'Inter', sans-serif; outline: none; }
+    .phone-input:focus { border-color: #2563eb; }
+    .phone-input::placeholder { color: #4b5563; }
+    .send-btn { background: #2563eb; color: #fff; border: none; border-radius: 10px; padding: 14px 24px; font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.2s, transform 0.2s; white-space: nowrap; box-shadow: 0 0 20px rgba(37,99,235,0.4); }
+    .send-btn:hover { background: #1d4ed8; transform: translateY(-1px); }
+    .success-msg { display: none; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); border-radius: 12px; padding: 16px; color: #86efac; font-weight: 600; margin-top: 16px; font-size: 15px; }
+
+    /* Pain */
+    .pain { padding: 100px 20px; text-align: center; }
+    .pain h2 { font-size: 44px; font-weight: 800; letter-spacing: -1px; margin-bottom: 16px; }
+    .pain > p { color: #9ca3af; font-size: 18px; max-width: 560px; margin: 0 auto 60px; line-height: 1.7; }
+    .pain-grid { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; max-width: 980px; margin: 0 auto; }
+    .pain-card { background: rgba(239,68,68,0.05); border: 1px solid rgba(239,68,68,0.2); border-radius: 16px; padding: 36px 30px; width: 290px; text-align: left; transition: transform 0.3s, border-color 0.3s; }
+    .pain-card:hover { transform: translateY(-4px); border-color: rgba(239,68,68,0.5); }
+    .pain-card .icon { font-size: 36px; margin-bottom: 18px; }
+    .pain-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 12px; color: #f87171; }
+    .pain-card p { color: #9ca3af; font-size: 15px; line-height: 1.7; }
+
+    /* Solution */
+    .solution { padding: 100px 20px; text-align: center; }
+    .solution h2 { font-size: 44px; font-weight: 800; letter-spacing: -1px; margin-bottom: 16px; }
+    .solution > p { color: #9ca3af; font-size: 18px; max-width: 560px; margin: 0 auto 60px; line-height: 1.7; }
+    .features { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; max-width: 1080px; margin: 0 auto; }
+    .feature { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 32px; width: 240px; text-align: left; transition: transform 0.3s, border-color 0.3s, background 0.3s; }
+    .feature:hover { transform: translateY(-4px); border-color: rgba(37,99,235,0.4); background: rgba(37,99,235,0.06); }
+    .feature .icon { font-size: 32px; margin-bottom: 16px; }
+    .feature h3 { font-size: 16px; font-weight: 700; margin-bottom: 10px; }
+    .feature p { color: #9ca3af; font-size: 14px; line-height: 1.7; }
+
+    /* How */
+    .how { padding: 100px 20px; text-align: center; background: rgba(255,255,255,0.02); border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .how h2 { font-size: 44px; font-weight: 800; letter-spacing: -1px; margin-bottom: 60px; }
+    .steps { display: flex; justify-content: center; max-width: 900px; margin: 0 auto; flex-wrap: wrap; }
+    .step { flex: 1; min-width: 200px; padding: 20px; position: relative; }
+    .step:not(:last-child)::after { content: '→'; position: absolute; right: -10px; top: 36px; color: #374151; font-size: 24px; }
+    .step-num { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #2563eb, #7c3aed); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; margin: 0 auto 20px; box-shadow: 0 0 30px rgba(37,99,235,0.4); }
+    .step h3 { font-size: 16px; font-weight: 700; margin-bottom: 10px; }
+    .step p { color: #9ca3af; font-size: 14px; line-height: 1.6; }
+
+    /* Pricing */
+    .pricing { padding: 100px 20px; text-align: center; }
+    .pricing h2 { font-size: 44px; font-weight: 800; letter-spacing: -1px; margin-bottom: 16px; }
+    .pricing > p { color: #9ca3af; font-size: 18px; margin-bottom: 60px; }
+    .price-card { display: inline-block; background: rgba(37,99,235,0.08); border: 2px solid #2563eb; border-radius: 20px; padding: 48px 40px; max-width: 420px; text-align: center; box-shadow: 0 0 60px rgba(37,99,235,0.2); }
+    .popular-badge { display: inline-block; background: #2563eb; color: #fff; padding: 5px 14px; border-radius: 999px; font-size: 12px; font-weight: 700; margin-bottom: 24px; }
+    .price { font-size: 64px; font-weight: 900; letter-spacing: -2px; }
+    .price sub { font-size: 20px; color: #9ca3af; font-weight: 500; letter-spacing: 0; }
+    .price-name { font-size: 20px; font-weight: 700; margin: 16px 0 8px; }
+    .price-desc { color: #9ca3af; font-size: 14px; margin-bottom: 32px; }
+    .price-list { list-style: none; text-align: left; margin-bottom: 36px; }
+    .price-list li { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #d1d5db; font-size: 15px; display: flex; gap: 10px; align-items: center; }
+    .price-list li .check { color: #3b82f6; font-weight: 800; }
+    .price-cta { display: block; background: #2563eb; color: #fff; padding: 15px; border-radius: 10px; font-size: 16px; font-weight: 700; text-decoration: none; box-shadow: 0 0 30px rgba(37,99,235,0.4); transition: transform 0.2s; }
+    .price-cta:hover { transform: translateY(-2px); }
+
+    /* FAQ */
+    .faq { padding: 100px 20px; }
+    .faq h2 { font-size: 44px; font-weight: 800; letter-spacing: -1px; text-align: center; margin-bottom: 60px; }
+    .faq-list { max-width: 700px; margin: 0 auto; }
+    .faq-item { border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 28px; margin-bottom: 12px; background: rgba(255,255,255,0.02); transition: border-color 0.2s; }
+    .faq-item:hover { border-color: rgba(37,99,235,0.3); }
+    .faq-item h3 { font-size: 17px; font-weight: 600; margin-bottom: 12px; }
+    .faq-item p { color: #9ca3af; font-size: 15px; line-height: 1.7; }
+
+    /* Final CTA */
+    .final-cta { padding: 120px 20px; text-align: center; background: radial-gradient(ellipse at center, rgba(37,99,235,0.15) 0%, transparent 70%); }
+    .final-cta h2 { font-size: 52px; font-weight: 900; letter-spacing: -2px; margin-bottom: 20px; }
+    .final-cta p { color: #9ca3af; font-size: 20px; margin-bottom: 48px; }
+
+    footer { text-align: center; padding: 36px; color: #374151; font-size: 14px; border-top: 1px solid rgba(255,255,255,0.05); }
+    footer a { color: #4b5563; text-decoration: none; }
+
+    .fade-up { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 768px) {
+      nav { padding: 16px 24px; }
+      .nav-links { display: none; }
+      .hero h1 { font-size: 42px; letter-spacing: -1px; }
+      .hero p { font-size: 17px; }
+      .stats { gap: 30px; }
+      .step:not(:last-child)::after { display: none; }
+      .phone-input-row { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+<canvas id="bg-canvas"></canvas>
+
+<nav>
+  <div class="logo"><div class="logo-icon">📞</div>First<span>Ring</span></div>
+  <div class="nav-links">
+    <a href="#demo">Live Demo</a>
+    <a href="#how">How it Works</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#faq">FAQ</a>
+  </div>
+  <a href="https://cal.com" class="nav-cta">Get Started Free →</a>
+</nav>
+
+<section class="hero">
+  <div class="badge"><span class="badge-dot"></span> AI Receptionist for Plumbers</div>
+  <h1>Stop Losing Jobs<br><span class="grad">to Missed Calls</span></h1>
+  <p>FirstRing answers every call, texts every lead, and books every appointment — 24/7. While you're under a sink, we're closing your next job.</p>
+  <div class="hero-btns">
+    <a href="#demo" class="btn-primary">🎬 Watch Live Demo</a>
+    <a href="#pricing" class="btn-secondary">See Pricing →</a>
+  </div>
+  <p class="hero-sub">No contracts · No setup fees · Cancel anytime</p>
+</section>
+
+<div class="stats">
+  <div class="stat fade-up"><div class="stat-num">$2K+</div><div class="stat-label">Daily revenue recovered</div></div>
+  <div class="stat fade-up"><div class="stat-num">24/7</div><div class="stat-label">Always-on availability</div></div>
+  <div class="stat fade-up"><div class="stat-num">&lt;5s</div><div class="stat-label">Average response time</div></div>
+  <div class="stat fade-up"><div class="stat-num">3–5x</div><div class="stat-label">More jobs booked per week</div></div>
+</div>
+
+<!-- DEMO -->
+<section class="demo-section" id="demo">
+  <div class="section-label">Live Demo</div>
+  <h2 class="fade-up">Watch FirstRing Handle a Real Customer</h2>
+  <p class="fade-up">This is exactly what happens when someone texts or calls your plumbing business while you're on a job.</p>
+
+  <!-- Booking mode toggle -->
+  <div class="mode-toggle-row">
+    <span class="mode-label active-label" id="label-confirm">Owner Confirms</span>
+    <label class="toggle-wrap">
+      <input type="checkbox" id="mode-toggle" onchange="onModeChange()">
+      <span class="toggle-slider"></span>
+    </label>
+    <span class="mode-label" id="label-auto">Auto-Book</span>
+    <span class="mode-badge confirm" id="mode-badge">Owner approves each booking</span>
+  </div>
+
+  <div class="demo-tabs">
+    <button class="demo-tab active" id="tab-sms" onclick="switchDemo('sms', this)">💬 Text Message</button>
+    <button class="demo-tab" id="tab-call" onclick="switchDemo('call', this)">📞 Phone Call</button>
+  </div>
+
+  <div class="demo-panels">
+    <!-- SMS DEMO (default) -->
+    <div class="sms-demo" id="sms-demo">
+      <div class="sms-shell">
+        <div class="sms-header">
+          <div class="phone-avatar">🤖</div>
+          <div class="phone-info"><h4>FirstRing AI</h4><p>Texting for Mike's Plumbing</p></div>
+          <div class="phone-status"><span class="phone-status-dot"></span> Active</div>
+        </div>
+        <div class="sms-messages" id="sms-log"></div>
+      </div>
+    </div>
+
+    <!-- CALL DEMO -->
+    <div class="phone-demo" id="call-demo" style="display:none;">
+      <div class="phone-shell">
+        <div class="phone-header">
+          <div class="phone-avatar">🤖</div>
+          <div class="phone-info"><h4>FirstRing AI</h4><p>Answering for Mike's Plumbing</p></div>
+          <div class="phone-status"><span class="phone-status-dot"></span> Live Call</div>
+        </div>
+        <div class="call-transcript" id="call-log"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Owner notification -->
+  <div class="owner-notify" id="owner-notify">
+    <div class="owner-notify-title">🔔 New Lead — Action Required</div>
+    <p>
+      <strong>Customer:</strong> Sarah Johnson<br>
+      <strong>Issue:</strong> Burst pipe under kitchen sink<br>
+      <strong>Requested:</strong> Tuesday at 2pm<br>
+      <strong>Address:</strong> 4821 Maple Street
+    </p>
+    <div class="owner-notify-btns">
+      <button class="confirm-btn" onclick="ownerConfirm()">✅ Confirm 2pm</button>
+      <button class="reschedule-btn" onclick="ownerReschedule()">📅 Suggest Different Time</button>
+    </div>
+  </div>
+
+  <!-- Demo CTA -->
+  <div class="demo-cta-box" id="demo-cta">
+    <h3>🎯 That just saved a $600 job.</h3>
+    <p>Want this working for your plumbing business? Enter your number and we'll text you right now to show you it's real.</p>
+    <div class="phone-input-row">
+      <input class="phone-input" id="prospect-phone" type="tel" placeholder="Your phone number" />
+      <button class="send-btn" onclick="sendDemoText()">Text Me →</button>
+    </div>
+    <div class="success-msg" id="success-msg">✅ Text sent! Check your phone — FirstRing just introduced itself.</div>
+  </div>
+</section>
+
+<!-- PAIN -->
+<section class="pain">
+  <div class="section-label">The Problem</div>
+  <h2 class="fade-up">Every Missed Call Is Money<br>Walking Out The Door</h2>
+  <p class="fade-up">The average plumber misses 3–5 calls a day. At $400 a job, that's up to $2,000 in lost revenue — every single day.</p>
+  <div class="pain-grid">
+    <div class="pain-card fade-up"><div class="icon">📵</div><h3>You're Under a Sink</h3><p>You can't answer your phone mid-job. The customer calls your competitor. You never knew they called.</p></div>
+    <div class="pain-card fade-up"><div class="icon">🌙</div><h3>After Hours = Lost Jobs</h3><p>Pipes burst at 11pm. Customers need help now. If you don't answer, someone else does — and gets paid.</p></div>
+    <div class="pain-card fade-up"><div class="icon">📨</div><h3>Voicemails Don't Close</h3><p>Customers hang up on voicemail. They don't leave messages. They call the next plumber on Google.</p></div>
+  </div>
+</section>
+
+<!-- SOLUTION -->
+<section class="solution">
+  <div class="section-label">The Solution</div>
+  <h2 class="fade-up">Your AI Receptionist<br>Never Misses a Lead</h2>
+  <p class="fade-up">FirstRing qualifies every lead, collects their info, and either holds for your approval or books automatically — your choice.</p>
+  <div class="features">
+    <div class="feature fade-up"><div class="icon">📞</div><h3>Answers Every Call 24/7</h3><p>Picks up in seconds, speaks naturally, handles the conversation like a trained receptionist.</p></div>
+    <div class="feature fade-up"><div class="icon">💬</div><h3>Texts & Website Chat</h3><p>Replies to texts and website visitors instantly. No lead goes cold, no matter how they reach out.</p></div>
+    <div class="feature fade-up"><div class="icon">📅</div><h3>Flexible Booking</h3><p>Owner-confirm mode or fully automatic — switch anytime from your dashboard.</p></div>
+    <div class="feature fade-up"><div class="icon">⚡</div><h3>Instant Notifications</h3><p>Every new lead hits your phone the second it comes in so you never miss a thing.</p></div>
+    <div class="feature fade-up"><div class="icon">🧠</div><h3>Learns Your Business</h3><p>Knows your services, pricing, and availability. Answers exactly how you would.</p></div>
+    <div class="feature fade-up"><div class="icon">🔒</div><h3>Done-For-You Setup</h3><p>We handle everything. You're live within 24 hours with zero technical work on your end.</p></div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+  <div class="section-label">The Process</div>
+  <h2 class="fade-up">Up and Running in 24 Hours</h2>
+  <div class="steps">
+    <div class="step fade-up"><div class="step-num">1</div><h3>Book a Demo</h3><p>15-minute call. We show you exactly how it works for your business.</p></div>
+    <div class="step fade-up"><div class="step-num">2</div><h3>We Set It Up</h3><p>We configure everything. You don't touch a single button.</p></div>
+    <div class="step fade-up"><div class="step-num">3</div><h3>Go Live</h3><p>Your AI receptionist is live within 24 hours. Start capturing every lead.</p></div>
+    <div class="step fade-up"><div class="step-num">4</div><h3>Get Paid</h3><p>Watch missed calls turn into booked jobs and revenue.</p></div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="section-label">Pricing</div>
+  <h2 class="fade-up">Simple, Flat Pricing</h2>
+  <p class="fade-up">One plan. Everything included. No surprises.</p>
+  <div class="price-card fade-up">
+    <div class="popular-badge">MOST POPULAR</div>
+    <div class="price">$297<sub>/mo</sub></div>
+    <div class="price-name">Full AI Receptionist</div>
+    <div class="price-desc">Everything you need to never miss a job again.</div>
+    <ul class="price-list">
+      <li><span class="check">✓</span> 24/7 AI phone answering</li>
+      <li><span class="check">✓</span> SMS & text reply automation</li>
+      <li><span class="check">✓</span> Website chat widget</li>
+      <li><span class="check">✓</span> Owner-confirm or auto-book mode</li>
+      <li><span class="check">✓</span> Instant lead notifications</li>
+      <li><span class="check">✓</span> Full setup done for you</li>
+      <li><span class="check">✓</span> No contracts, cancel anytime</li>
+    </ul>
+    <a href="https://cal.com" class="price-cta">Start Free — Book a Demo →</a>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq" id="faq">
+  <div class="section-label" style="text-align:center">FAQ</div>
+  <h2 class="fade-up">Common Questions</h2>
+  <div class="faq-list">
+    <div class="faq-item fade-up"><h3>Do I need any technical experience?</h3><p>Zero. We set everything up for you. You just forward your business number and we handle the rest.</p></div>
+    <div class="faq-item fade-up"><h3>Does it sound like a robot?</h3><p>No. The AI uses natural, conversational speech. Most customers genuinely can't tell the difference.</p></div>
+    <div class="faq-item fade-up"><h3>Can I control when appointments get booked?</h3><p>Yes. In Owner Confirm mode, you approve every booking before the customer is notified. Switch to Auto-Book anytime when you're ready to let it run fully automatic.</p></div>
+    <div class="faq-item fade-up"><h3>How fast is setup?</h3><p>Most plumbers are live within 24 hours of signing up.</p></div>
+    <div class="faq-item fade-up"><h3>Is there a contract?</h3><p>No. Month to month. Cancel anytime with no fees, no questions asked.</p></div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <h2 class="fade-up">Ready to Stop<br>Losing Jobs?</h2>
+  <p class="fade-up">Book a free 15-minute demo. No pressure, no commitment.</p>
+  <a href="https://cal.com" class="btn-primary fade-up" style="font-size:20px;padding:20px 52px;">Book Your Free Demo →</a>
+</section>
+
+<footer>
+  © 2025 FirstRing · Built by Rodrigo Ibarra, Yakima WA ·
+  <a href="mailto:plumberaiassistant@gmail.com">plumberaiassistant@gmail.com</a>
+</footer>
+
+<script>
+// ── Particles ──
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+resize(); window.addEventListener('resize', resize);
+for (let i = 0; i < 60; i++) particles.push({ x: Math.random()*window.innerWidth, y: Math.random()*window.innerHeight, vx: (Math.random()-0.5)*0.3, vy: (Math.random()-0.5)*0.3, r: Math.random()*1.5+0.5, alpha: Math.random()*0.4+0.1 });
+function drawParticles() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p => {
+    p.x+=p.vx; p.y+=p.vy;
+    if(p.x<0) p.x=canvas.width; if(p.x>canvas.width) p.x=0;
+    if(p.y<0) p.y=canvas.height; if(p.y>canvas.height) p.y=0;
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(59,130,246,${p.alpha})`; ctx.fill();
+  });
+  for(let i=0;i<particles.length;i++) for(let j=i+1;j<particles.length;j++){
+    const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y, dist=Math.sqrt(dx*dx+dy*dy);
+    if(dist<120){ ctx.beginPath(); ctx.moveTo(particles[i].x,particles[i].y); ctx.lineTo(particles[j].x,particles[j].y); ctx.strokeStyle=`rgba(59,130,246,${0.08*(1-dist/120)})`; ctx.lineWidth=0.5; ctx.stroke(); }
+  }
+  requestAnimationFrame(drawParticles);
+}
+drawParticles();
+
+// ── Scroll fade ──
+const fadeObs = new IntersectionObserver(entries => entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); }), {threshold:0.1});
+document.querySelectorAll('.fade-up').forEach(el => fadeObs.observe(el));
+
+// ── Demo state ──
+let autoBook = false;
+let currentDemo = 'sms';
+let demoTimers = [];
+let demoRunning = false;
+let demoVisible = false;
+let demoPlayed = { sms: false, call: false };
+
+function onModeChange() {
+  autoBook = document.getElementById('mode-toggle').checked;
+  const badge = document.getElementById('mode-badge');
+  const labelConfirm = document.getElementById('label-confirm');
+  const labelAuto = document.getElementById('label-auto');
+  if(autoBook) {
+    badge.textContent = 'Fully automatic — no approval needed';
+    badge.className = 'mode-badge auto';
+    labelConfirm.classList.remove('active-label');
+    labelAuto.classList.add('active-label');
+  } else {
+    badge.textContent = 'Owner approves each booking';
+    badge.className = 'mode-badge confirm';
+    labelConfirm.classList.add('active-label');
+    labelAuto.classList.remove('active-label');
+  }
+  resetDemo();
+  startDemo();
+}
+
+function switchDemo(type, btn) {
+  document.querySelectorAll('.demo-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  currentDemo = type;
+  document.getElementById('sms-demo').style.display = type==='sms' ? 'block' : 'none';
+  document.getElementById('call-demo').style.display = type==='call' ? 'block' : 'none';
+  resetDemo();
+  if(demoVisible) startDemo();
+}
+
+function resetDemo() {
+  demoTimers.forEach(t => clearTimeout(t));
+  demoTimers = [];
+  demoRunning = false;
+  document.getElementById('sms-log').innerHTML = '';
+  document.getElementById('call-log').innerHTML = '';
+  document.getElementById('owner-notify').classList.remove('show');
+  document.getElementById('demo-cta').classList.remove('show');
+  demoPlayed[currentDemo] = false;
+}
+
+// ── Intersection observer for demo section ──
+const demoSection = document.getElementById('demo');
+const demoObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if(e.isIntersecting) {
+      demoVisible = true;
+      if(!demoPlayed[currentDemo] && !demoRunning) startDemo();
+    } else {
+      demoVisible = false;
+      if(demoRunning) {
+        demoTimers.forEach(t => clearTimeout(t));
+        demoTimers = [];
+        demoRunning = false;
+        // reset so it replays when scrolled back
+        demoPlayed[currentDemo] = false;
+        document.getElementById('sms-log').innerHTML = '';
+        document.getElementById('call-log').innerHTML = '';
+        document.getElementById('owner-notify').classList.remove('show');
+        document.getElementById('demo-cta').classList.remove('show');
+      }
+    }
+  });
+}, { threshold: 0.25 });
+demoObs.observe(demoSection);
+
+function startDemo() {
+  if(demoPlayed[currentDemo] || demoRunning) return;
+  demoRunning = true;
+  if(currentDemo === 'sms') playSMSDemo();
+  else playCallDemo();
+}
+
+function t(fn, delay) {
+  const id = setTimeout(() => { if(demoRunning) fn(); }, delay);
+  demoTimers.push(id);
+  return id;
+}
+
+// ── SMS Scripts ──
+const smsConfirm = [
+  { from:'customer', text:'Hi, do you do emergency plumbing? My pipe burst under the kitchen sink.', time:'2:14 PM' },
+  { from:'ai', text:'Hi! Yes, we handle plumbing emergencies 24/7. Is the water shut off at the main valve?', time:'2:14 PM' },
+  { from:'customer', text:'Yeah just turned it off. There\'s water all over the floor though.', time:'2:15 PM' },
+  { from:'ai', text:'Good thinking. Can I get your name and address so we can get Mike out to you?', time:'2:15 PM' },
+  { from:'customer', text:'Sarah Johnson, 4821 Maple Street.', time:'2:16 PM' },
+  { from:'ai', text:'Thanks Sarah. What time works best for you — this afternoon or tomorrow morning?', time:'2:16 PM' },
+  { from:'customer', text:'This afternoon if possible, like around 2pm?', time:'2:17 PM' },
+  { from:'ai', text:'Perfect. I\'ve sent your request to Mike for confirmation. You\'ll get a text within 15 minutes once he confirms your 2pm slot. Anything else I can help with?', time:'2:17 PM', isConfirmMsg: true },
+  { from:'customer', text:'No that\'s great, thank you!', time:'2:17 PM' },
+];
+
+const smsAuto = [
+  { from:'customer', text:'Hi, do you do emergency plumbing? My pipe burst under the kitchen sink.', time:'2:14 PM' },
+  { from:'ai', text:'Hi! Yes, we handle plumbing emergencies 24/7. Is the water shut off at the main valve?', time:'2:14 PM' },
+  { from:'customer', text:'Yeah just turned it off. There\'s water all over the floor though.', time:'2:15 PM' },
+  { from:'ai', text:'Good thinking. Can I get your name and address so we can get Mike out to you?', time:'2:15 PM' },
+  { from:'customer', text:'Sarah Johnson, 4821 Maple Street.', time:'2:16 PM' },
+  { from:'ai', text:'Thanks Sarah. What time works best for you — this afternoon or tomorrow morning?', time:'2:16 PM' },
+  { from:'customer', text:'This afternoon if possible, like around 2pm?', time:'2:17 PM' },
+  { from:'ai', text:'Booked! ✅ Mike\'s Plumbing will arrive at 2pm at 4821 Maple Street. You\'ll get a text when he\'s 20 min away. Anything else?', time:'2:17 PM' },
+  { from:'customer', text:'No that\'s great, thank you!', time:'2:18 PM' },
+];
+
+// ── Call Scripts ──
+const callConfirm = [
+  { speaker:'ai', text:'Thank you for calling Mike\'s Plumbing — I\'m the AI receptionist. How can I help you today?' },
+  { speaker:'customer', text:'Hi yeah, I\'ve got a burst pipe under my kitchen sink, there\'s water everywhere.' },
+  { speaker:'ai', text:'Oh no, let\'s get this sorted fast. Is the water shut off at the main valve right now?' },
+  { speaker:'customer', text:'Yeah I just turned it off.' },
+  { speaker:'ai', text:'Perfect. Can I get your name and address?' },
+  { speaker:'customer', text:'It\'s Sarah Johnson, 4821 Maple Street.' },
+  { speaker:'ai', text:'Got it Sarah. What time works best for you — this afternoon or tomorrow morning?' },
+  { speaker:'customer', text:'This afternoon, around 2pm?' },
+  { speaker:'ai', text:'I\'ve sent your request to Mike. He\'ll confirm your 2pm slot within 15 minutes and you\'ll get a text with confirmation. Is there anything else I can help with?', isConfirmMsg: true },
+  { speaker:'customer', text:'No that\'s perfect, thank you!' },
+  { speaker:'ai', text:'Great. Mike will be in touch shortly. Have a good day Sarah!' },
+];
+
+const callAuto = [
+  { speaker:'ai', text:'Thank you for calling Mike\'s Plumbing — I\'m the AI receptionist. How can I help you today?' },
+  { speaker:'customer', text:'Hi yeah, I\'ve got a burst pipe under my kitchen sink, there\'s water everywhere.' },
+  { speaker:'ai', text:'Oh no, let\'s get this sorted fast. Is the water shut off at the main valve right now?' },
+  { speaker:'customer', text:'Yeah I just turned it off.' },
+  { speaker:'ai', text:'Perfect. Can I get your name and address?' },
+  { speaker:'customer', text:'It\'s Sarah Johnson, 4821 Maple Street.' },
+  { speaker:'ai', text:'Got it Sarah. What time works best for you — this afternoon or tomorrow morning?' },
+  { speaker:'customer', text:'This afternoon, around 2pm?' },
+  { speaker:'ai', text:'Done. You\'re booked for 2pm today at 4821 Maple Street. Mike will call you 30 minutes before arriving. Is there anything else?' },
+  { speaker:'customer', text:'No that\'s great, thank you!' },
+  { speaker:'ai', text:'Perfect. See you at 2pm Sarah. Have a great day!' },
+];
+
+function playSMSDemo() {
+  const log = document.getElementById('sms-log');
+  const script = autoBook ? smsAuto : smsConfirm;
+  let cumDelay = 400;
+
+  script.forEach((msg, i) => {
+    const isAI = msg.from === 'ai';
+    const typingDelay = isAI ? msg.text.length * 22 + 500 : 0;
+
+    if(isAI) {
+      t(() => {
+        const typing = document.createElement('div');
+        typing.className = 'sms-msg from-ai'; typing.id = 'typing-indicator';
+        typing.innerHTML = `<div class="sms-bubble"><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>`;
+        log.appendChild(typing);
+        setTimeout(() => { typing.classList.add('show'); log.scrollTop = log.scrollHeight; }, 50);
+      }, cumDelay);
+      cumDelay += typingDelay;
+      t(() => {
+        const ti = document.getElementById('typing-indicator');
+        if(ti) log.removeChild(ti);
+        addSMSMsg(msg, log);
+        if(msg.isConfirmMsg && !autoBook) {
+          t(() => document.getElementById('owner-notify').classList.add('show'), 800);
+        }
+        if(i === script.length - 1) {
+          if(autoBook) t(() => document.getElementById('demo-cta').classList.add('show'), 800);
+          demoPlayed.sms = true; demoRunning = false;
+        }
+      }, cumDelay);
+    } else {
+      t(() => { addSMSMsg(msg, log); }, cumDelay);
+    }
+    cumDelay += isAI ? 1000 : 1400;
+  });
+}
+
+function addSMSMsg(msg, log) {
+  const div = document.createElement('div');
+  const bubbleClass = msg.isConfirmMsg && !autoBook ? 'confirm-sms-bubble' : 'sms-bubble';
+  div.className = `sms-msg from-${msg.from}`;
+  div.innerHTML = `<div class="${bubbleClass}">${msg.text}</div><div class="sms-time">${msg.time || ''}</div>`;
+  log.appendChild(div);
+  setTimeout(() => { div.classList.add('show'); log.scrollTop = log.scrollHeight; }, 50);
+}
+
+function playCallDemo() {
+  const log = document.getElementById('call-log');
+  const script = autoBook ? callAuto : callConfirm;
+  let cumDelay = 600;
+
+  script.forEach((line, i) => {
+    const typingDelay = line.text.length * 26 + 400;
+
+    t(() => {
+      const typing = document.createElement('div');
+      typing.className = `call-line ${line.speaker==='ai'?'ai-line':''}`; typing.id='call-typing';
+      typing.innerHTML = `<div class="call-speaker ${line.speaker}">${line.speaker==='ai'?'🤖 AI':'👤 Sarah'}</div><div class="call-bubble"><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>`;
+      log.appendChild(typing);
+      setTimeout(() => { typing.classList.add('show'); log.scrollTop = log.scrollHeight; }, 50);
+    }, cumDelay);
+
+    cumDelay += typingDelay;
+
+    t(() => {
+      const ti = document.getElementById('call-typing');
+      if(ti) log.removeChild(ti);
+      const bubbleClass = line.isConfirmMsg && !autoBook ? 'confirm-bubble' : 'call-bubble';
+      const div = document.createElement('div');
+      div.className = `call-line ${line.speaker==='ai'?'ai-line':''}`;
+      div.innerHTML = `<div class="call-speaker ${line.speaker}">${line.speaker==='ai'?'🤖 AI':'👤 Sarah'}</div><div class="${bubbleClass}">${line.text}</div>`;
+      log.appendChild(div);
+      setTimeout(() => { div.classList.add('show'); log.scrollTop = log.scrollHeight; }, 50);
+      if(line.isConfirmMsg && !autoBook) {
+        t(() => document.getElementById('owner-notify').classList.add('show'), 800);
+      }
+      if(i === script.length - 1) {
+        if(autoBook) t(() => document.getElementById('demo-cta').classList.add('show'), 800);
+        demoPlayed.call = true; demoRunning = false;
+      }
+    }, cumDelay);
+
+    cumDelay += 1200;
+  });
+}
+
+function ownerConfirm() {
+  document.getElementById('owner-notify').innerHTML = `
+    <div class="owner-notify-title" style="color:#4ade80">✅ Booking Confirmed</div>
+    <p style="color:#86efac">You confirmed 2pm. Sarah Johnson is being notified now — her appointment is locked in at 4821 Maple Street.</p>
+  `;
+  setTimeout(() => document.getElementById('demo-cta').classList.add('show'), 800);
+}
+
+function ownerReschedule() {
+  document.getElementById('owner-notify').innerHTML = `
+    <div class="owner-notify-title" style="color:#f59e0b">📅 Reschedule Sent</div>
+    <p style="color:#d1d5db">Sarah has been texted that you'll confirm a new time shortly. FirstRing is waiting for your reply to send her the updated slot.</p>
+  `;
+  setTimeout(() => document.getElementById('demo-cta').classList.add('show'), 800);
+}
+
+function sendDemoText() {
+  const phone = document.getElementById('prospect-phone').value.trim();
+  if(!phone) { alert('Enter your phone number first.'); return; }
+  document.getElementById('success-msg').style.display = 'block';
+  document.querySelector('.send-btn').textContent = 'Sent ✓';
+  document.querySelector('.send-btn').style.background = '#16a34a';
+}
+</script>
+</body>
+</html>
