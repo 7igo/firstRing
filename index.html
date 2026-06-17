@@ -692,7 +692,17 @@ function playCall(){
 
 function ownerConfirm(){document.getElementById('owner-notify').innerHTML=`<div class="notify-title" style="color:#4ade80">✅ Booking Approved</div><p style="color:#86efac">Sarah Johnson is being texted now. Confirmed for 2pm at 4821 Maple Street.</p>`;setTimeout(()=>document.getElementById('demo-cta').classList.add('show'),600);}
 function ownerReschedule(){document.getElementById('owner-notify').innerHTML=`<div class="notify-title" style="color:#f59e0b">📅 Reschedule Sent</div><p style="color:#d1d5db">Sarah has been notified you'll confirm a new time shortly. FirstRing is holding her spot.</p>`;setTimeout(()=>document.getElementById('demo-cta').classList.add('show'),600);}
-function sendDemoText(){const p=document.getElementById('prospect-phone').value.trim();if(!p){alert('Enter your phone number first.');return;}document.getElementById('success-msg').style.display='block';const b=document.querySelector('.text-btn');b.textContent='Sent ✓';b.style.background='#16a34a';}
+async function sendDemoText(){
+  const p=document.getElementById('prospect-phone').value.trim();
+  if(!p){alert('Enter your phone number first.');return;}
+  const b=document.querySelector('.text-btn');
+  b.textContent='Sending...';b.disabled=true;
+  try{
+    await fetch('https://hook.us2.make.com/cs946tm2ck5s6ij7rrxsmpht6rcedwt7',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:p,source:'FirstRing website demo',time:new Date().toLocaleString()})});
+  }catch(e){}
+  document.getElementById('success-msg').style.display='block';
+  b.textContent='Sent ✓';b.style.background='#16a34a';
+}
 </script>
 </body>
 </html>
