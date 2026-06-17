@@ -24,10 +24,8 @@
     /* ── Nav ── */
     nav { display:flex; justify-content:space-between; align-items:center; padding:0 72px; height:68px; backdrop-filter:blur(16px) saturate(180%); background:rgba(5,8,16,0.75); border-bottom:1px solid rgba(255,255,255,0.07); position:sticky; top:0; z-index:100; }
     .logo { display:flex; align-items:center; gap:10px; text-decoration:none; }
-    .logo-mark { width:32px; height:32px; background:linear-gradient(135deg,#2563eb,#7c3aed); border-radius:7px; display:flex; align-items:center; justify-content:center; box-shadow:0 0 16px rgba(37,99,235,0.5); flex-shrink:0; }
-    .logo-mark svg { width:16px; height:16px; fill:none; stroke:#fff; stroke-width:2.5; stroke-linecap:round; }
-    .logo-text { font-size:18px; font-weight:800; letter-spacing:-0.5px; color:#fff; }
-    .logo-text span { color:#3b82f6; }
+    .logo-text { font-size:20px; font-weight:900; letter-spacing:-0.8px; color:#fff; }
+    .logo-ring { background:linear-gradient(135deg,#60a5fa,#a78bfa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
     .nav-links { display:flex; gap:32px; }
     .nav-links a { color:#6b7280; text-decoration:none; font-size:14px; font-weight:500; transition:color 0.15s; }
     .nav-links a:hover { color:#e5e7eb; }
@@ -122,8 +120,8 @@
     @keyframes bounce{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-7px);}}
 
     /* Owner notify */
-    .owner-notify { max-width:460px; margin:0 auto 20px; background:rgba(234,179,8,0.06); border:1px solid rgba(234,179,8,0.2); border-radius:14px; padding:18px 22px; text-align:left; opacity:0; transform:translateY(14px); transition:opacity 0.45s,transform 0.45s; }
-    .owner-notify.show{opacity:1;transform:translateY(0);}
+    .owner-notify { max-width:360px; background:rgba(15,18,30,0.97); border:1px solid rgba(234,179,8,0.35); border-radius:14px; padding:18px 22px; text-align:left; opacity:0; transform:translateY(20px); transition:opacity 0.45s,transform 0.45s; position:fixed; bottom:24px; right:24px; z-index:200; box-shadow:0 8px 32px rgba(0,0,0,0.5),0 0 0 1px rgba(234,179,8,0.1); pointer-events:none; }
+    .owner-notify.show{opacity:1;transform:translateY(0);pointer-events:all;}
     .notify-title { font-size:12px; font-weight:700; color:#fbbf24; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px; display:flex; align-items:center; gap:6px; }
     .owner-notify p { font-size:13.5px; color:#d1d5db; line-height:1.7; margin-bottom:14px; }
     .notify-btns { display:flex; gap:8px; }
@@ -230,16 +228,90 @@
     .fade-up{opacity:0;transform:translateY(24px);transition:opacity 0.55s ease,transform 0.55s ease;}
     .fade-up.visible{opacity:1;transform:translateY(0);}
 
-    @media(max-width:960px){.feat-col{display:none;}}
+    /* ── Mobile chips (shown below demo on mobile) ── */
+    .mobile-chips{display:none;flex-wrap:wrap;gap:10px;justify-content:center;width:100%;margin:0 auto 28px;padding:0 16px;}
+    .mobile-chips .feat-chip{opacity:0;transform:translateY(12px);transition:opacity 0.45s,transform 0.45s;width:calc(50% - 5px);box-sizing:border-box;}
+    .mobile-chips .feat-chip.pop{opacity:1;transform:translateY(0);}
+
+    /* ── Tablet ── */
+    @media(max-width:960px){
+      .feat-col{display:none;}
+      .mobile-chips{display:flex;}
+    }
+
+    /* ── Mobile ── */
     @media(max-width:768px){
-      nav{padding:0 20px;}
+      nav{padding:0 16px;height:60px;}
       .nav-links{display:none;}
-      .hero h1{font-size:40px;letter-spacing:-1.5px;}
-      .hero-sub{font-size:16px;}
-      .section-h{font-size:32px;}
-      .final-cta h2{font-size:36px;}
+      .nav-cta{padding:7px 12px;font-size:12px;white-space:nowrap;}
+      .logo-text{font-size:16px;}
+
+      .hero{padding:64px 20px 56px;}
+      .hero h1{font-size:36px;letter-spacing:-1px;line-height:1.12;}
+      .hero-sub{font-size:15px;line-height:1.7;}
+      .hero-actions{flex-direction:column;align-items:center;}
+      .btn-primary,.btn-ghost{width:100%;max-width:320px;justify-content:center;}
+
+      .trust-bar{gap:16px;padding:20px 16px;}
+      .trust-item{font-size:12px;}
+
+      .stats-row{padding:40px 16px;gap:0;}
+      .stat{min-width:50%;flex:0 0 50%;padding:18px 12px;}
+      .stat:nth-child(2)::after{display:none;}
+      .stat-num{font-size:32px;}
+      .stat-label{font-size:12px;}
+
+      .demo-section{padding:64px 16px;}
+      .demo-tabs{width:100%;max-width:320px;}
+      .demo-tab{padding:8px 14px;font-size:13px;}
+      .demo-outer{flex-direction:column;align-items:stretch;margin-bottom:28px;gap:0;}
+      .demo-center{width:100%;max-width:100%;min-width:0;}
+      .sms-messages,.call-transcript{height:280px;}
+      .owner-notify{max-width:calc(100vw - 32px);right:16px;bottom:16px;padding:14px 16px;}
+      .owner-notify p{font-size:13px;margin-bottom:10px;}
+      .notify-title{font-size:11px;}
+      .confirm-btn,.reschedule-btn{font-size:12px;padding:8px;}
+      .lead-cta{max-width:100%;padding:24px 18px;}
+      .lead-cta h3{font-size:17px;}
       .input-row{flex-direction:column;}
+      .text-btn{width:100%;padding:14px;}
+
+      .section-h{font-size:28px;letter-spacing:-0.5px;}
+      .section-p{font-size:15px;margin-bottom:36px;}
+
+      .pain{padding:64px 16px;}
+      .pain-grid{gap:12px;}
+      .pain-card{width:100%;max-width:100%;}
+
+      .solution{padding:64px 16px;}
+      .features-grid{gap:12px;}
+      .feat-card{width:100%;max-width:100%;}
+
+      .how{padding:64px 16px;}
+      .steps-row{flex-direction:column;gap:0;}
+      .step{min-width:0;padding:20px 16px;}
       .step:not(:last-child)::after{display:none;}
+
+      .pricing{padding:64px 16px;}
+      .pricing-grid{gap:14px;}
+      .p-card{width:100%;max-width:100%;}
+
+      .faq{padding:64px 16px;}
+      .faq h2{font-size:28px;margin-bottom:32px;}
+      .faq-item{padding:18px 16px;}
+
+      .final-cta{padding:80px 20px;}
+      .final-cta h2{font-size:30px;letter-spacing:-0.5px;}
+      .final-cta p{font-size:15px;}
+      .final-cta .btn-primary{width:100%;max-width:320px;justify-content:center;font-size:15px!important;padding:14px 24px!important;}
+
+      .mobile-chips .feat-chip{width:calc(50% - 5px);}
+    }
+
+    @media(max-width:380px){
+      .hero h1{font-size:30px;}
+      .mobile-chips .feat-chip{width:100%;}
+      .stat{min-width:50%;}
     }
   </style>
 </head>
@@ -253,10 +325,7 @@
 <!-- NAV -->
 <nav>
   <a href="#" class="logo">
-    <div class="logo-mark">
-      <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.01 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>
-    </div>
-    <span class="logo-text">First<span>Ring</span></span>
+    <span class="logo-text">First<span class="logo-ring">Ring</span></span>
   </a>
   <div class="nav-links">
     <a href="#demo">Demo</a>
@@ -343,6 +412,16 @@
       <div class="feat-chip" data-delay="7200"><div class="feat-chip-icon">📊</div><div class="feat-chip-title">Full Lead History</div><div class="feat-chip-desc">Every conversation is logged. See every lead and outcome.</div></div>
       <div class="feat-chip" data-delay="11500"><div class="feat-chip-icon">🔁</div><div class="feat-chip-title">Auto Follow-Up</div><div class="feat-chip-desc">If a lead goes quiet, FirstRing follows up automatically.</div></div>
     </div>
+  </div>
+
+  <!-- Mobile chips (shown below demo on small screens) -->
+  <div class="mobile-chips" id="mobile-chips">
+    <div class="feat-chip" data-delay="2200"><div class="feat-chip-icon">🎨</div><div class="feat-chip-title">Fully Customizable</div><div class="feat-chip-desc">Change the AI's name, tone, and personality to match your brand.</div></div>
+    <div class="feat-chip" data-delay="3800"><div class="feat-chip-icon">📋</div><div class="feat-chip-title">Asks Your Questions</div><div class="feat-chip-desc">Train it to ask exactly what you need — job type, address, urgency.</div></div>
+    <div class="feat-chip" data-delay="5500"><div class="feat-chip-icon">🌐</div><div class="feat-chip-title">Any Language</div><div class="feat-chip-desc">Responds in English, Spanish, or both — your choice.</div></div>
+    <div class="feat-chip" data-delay="7200"><div class="feat-chip-icon">📊</div><div class="feat-chip-title">Full Lead History</div><div class="feat-chip-desc">Every conversation is logged. See every lead and outcome.</div></div>
+    <div class="feat-chip" data-delay="9500"><div class="feat-chip-icon">⏰</div><div class="feat-chip-title">Custom Hours</div><div class="feat-chip-desc">Set when the AI is on, off, or hands off to you directly.</div></div>
+    <div class="feat-chip" data-delay="11500"><div class="feat-chip-icon">🔁</div><div class="feat-chip-title">Auto Follow-Up</div><div class="feat-chip-desc">If a lead goes quiet, FirstRing follows up automatically.</div></div>
   </div>
 
   <div class="owner-notify" id="owner-notify">
@@ -545,7 +624,7 @@ function switchDemo(type,btn){
 function start(){
   if(played[cur]||running)return;
   running=true;
-  // bubbles
+  // bubbles (desktop columns + mobile grid)
   document.querySelectorAll('.feat-chip').forEach(b=>{
     const id=setTimeout(()=>{if(running)b.classList.add('pop');},parseInt(b.dataset.delay)||2000);
     bTimers.push(id);
