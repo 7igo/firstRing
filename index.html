@@ -702,7 +702,13 @@ async function sendDemoText(){
   }catch(e){}
   document.getElementById('success-msg').style.display='block';
   b.textContent='Sent ✓';b.style.background='#16a34a';
+  b.disabled=false;
 }
+document.getElementById('prospect-phone').addEventListener('input',function(){
+  const b=document.querySelector('.text-btn');
+  b.textContent='Text Me →';b.style.background='';
+  document.getElementById('success-msg').style.display='none';
+});
 </script>
 </body>
 </html>
